@@ -82,8 +82,10 @@ class MobileNetHair():
         
         if split!='test':
             self.split='train'
+            self.batch_size=4
         else:
             self.split='test'
+            self.batch_size=1
         
     def forward(self):
         
@@ -92,7 +94,7 @@ class MobileNetHair():
         n.data, n.label = L.Python(module='hair_layers',
                 layer='SIFTFlowSegDataLayer', ntop=2,
                 param_str=str(dict(siftflow_dir='../data/hair/realdata/'+self.split,
-                    split=self.split, seed=1337, batch_size=4)))
+                    split=self.split, seed=1337, batch_size=self.batch_size)))
         
         n.initial_conv, n.initial_relu = conv_relu(n.data, 16, 3, 2, 1)
         

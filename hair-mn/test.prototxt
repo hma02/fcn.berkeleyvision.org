@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "hair_layers"
     layer: "SIFTFlowSegDataLayer"
-    param_str: "{\'siftflow_dir\': \'../data/hair/realdata/test\', \'seed\': 1337, \'split\': \'test\', \'batch_size\': 4}"
+    param_str: "{\'siftflow_dir\': \'../data/hair/realdata/test\', \'seed\': 1337, \'split\': \'test\', \'batch_size\': 1}"
   }
 }
 layer {
