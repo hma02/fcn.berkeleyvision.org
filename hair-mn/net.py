@@ -83,18 +83,58 @@ class MobileNetHair():
         if split!='test':
             self.split='train'
             self.batch_size=4
+            self.lmdb_data_path = '/home/allanma/data/hairlmdb/realdata/train_data'
+            self.lmdb_label_path = '/home/allanma/data/hairlmdb/realdata/train_label'
         else:
             self.split='test'
             self.batch_size=1
+            self.lmdb_data_path = '/home/allanma/data/hairlmdb/realdata/test_data'
+            self.lmdb_label_path = '/home/allanma/data/hairlmdb/realdata/test_label'
+            
+        
         
     def forward(self):
         
         n = caffe.NetSpec()
         
-        n.data, n.label = L.Python(module='hair_layers',
-                layer='SIFTFlowSegDataLayer', ntop=2,
-                param_str=str(dict(siftflow_dir='../data/hair/realdata/'+self.split,
-                    split=self.split, seed=1337, batch_size=self.batch_size)))
+        # n.data, n.label = L.Python(module='hair_layers',
+        #         layer='SIFTFlowSegDataLayer', ntop=2,
+        #         param_str=str(dict(siftflow_dir='../data/hair/realdata/'+self.split,
+        #             split=self.split, seed=1337, batch_size=self.batch_size)))
+          
+        n.data = L.Data( 
+                                transform_param=dict(
+                                                      scale=0.00390625,
+                                                      # mirror=true,
+                                                      # crop_size=100,
+                                                    #   mean_value: [103.94,116.78,123.68]
+                                                        ),
+                                data_param=dict(
+                                                batch_size = self.batch_size,
+                                                backend = caffe.params.Data.LMDB, 
+                                                source = self.lmdb_data_path, 
+                                                ),
+                                                ntop = 1
+                                                
+                                )
+        n.label = L.Data( 
+                                transform_param=dict(
+                                                      # scale=0.00390625,
+                                                      # mirror=true,
+                                                      # crop_size=100,
+                                                    #   mean_value: [103.94,116.78,123.68]
+                                                        ),
+                                data_param=dict(
+                                                batch_size = self.batch_size,
+                                                backend = caffe.params.Data.LMDB, 
+                                                source = self.lmdb_label_path, 
+                                                ),
+                                                ntop = 1
+                                )
+        # net.data_aug = caffe.layers.Python(net.data,
+        #                                        python_param = dict(module = 'tools.layers', layer = 'DataAugmentationRandomMultiplicativeNoiseLayer'))
+        # net.labels_aug = caffe.layers.Python(net.labels,
+        #                                          python_param = dict(module = 'tools.layers', layer = 'DataAugmentationDuplicateLabelsLayer'))
         
         n.initial_conv, n.initial_relu = conv_relu(n.data, 16, 3, 2, 1)
         

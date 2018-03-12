@@ -20,15 +20,17 @@ def compute_hist(net, save_dir, dataset, layer='score', gt='label'):
     for idx in tqdm(dataset):
         net.forward()
         hist += fast_hist(net.blobs[gt].data[0, 0].flatten(),
-                                net.blobs[layer].data[0].argmax(0).flatten(),
-                                n_cl)
+                          net.blobs[layer].data[0].argmax(0).flatten(),
+                          n_cl)
 
-        if save_dir:
-            im = Image.fromarray(net.blobs[layer].data[0].argmax(0).astype(np.uint8), mode='1')
-            # im_tmp = im.reshape([10,10], Image.NEAREST)
-            # print np.array(im_tmp, np.unit8)
-            # exit(0)
+        if idx<3 and save_dir:
+            im = Image.fromarray(net.blobs[layer].data[0].argmax(0).astype(np.uint8))
             im.save(os.path.join(save_dir, idx + '.png'))
+            # print "%d/%d" % ( hist.sum(axis=0)[1],  hist.sum() )  # how much percent of ones in prediction
+            # im.show()
+            # im_tmp = im.resize([10,10], Image.NEAREST)
+            
+            
         # compute the loss as well
         loss += net.blobs['loss'].data.flat[0]
     return hist, loss / len(dataset)

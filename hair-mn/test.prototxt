@@ -1,12 +1,21 @@
 layer {
   name: "data"
-  type: "Python"
+  type: "Data"
   top: "data"
+  data_param {
+    source: "/home/allanma/data/hairlmdb/realdata/test_data"
+    batch_size: 1
+    backend: LMDB
+  }
+}
+layer {
+  name: "label"
+  type: "Data"
   top: "label"
-  python_param {
-    module: "hair_layers"
-    layer: "SIFTFlowSegDataLayer"
-    param_str: "{\'siftflow_dir\': \'../data/hair/realdata/test\', \'seed\': 1337, \'split\': \'test\', \'batch_size\': 1}"
+  data_param {
+    source: "/home/allanma/data/hairlmdb/realdata/test_label"
+    batch_size: 1
+    backend: LMDB
   }
 }
 layer {
