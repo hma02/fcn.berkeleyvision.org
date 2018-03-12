@@ -5,13 +5,11 @@ test_iter: 200
 test_interval: 999999999
 
 display: 20
-# average_loss: 20
-base_lr: 0.0001
-lr_policy: "poly"
-power: 0.98
+base_lr: 0.001
+lr_policy: "fixed"
 max_iter: 3000000
 # momentum: 0.9
-weight_decay: 0.00002
+# weight_decay: 0.00002
 snapshot: 5000
 snapshot_prefix: "mobilenet"
 solver_mode: GPU

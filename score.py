@@ -24,10 +24,10 @@ def compute_hist(net, save_dir, dataset, layer='score', gt='label'):
                                 n_cl)
 
         if save_dir:
-            im = Image.fromarray(net.blobs[layer].data[0].argmax(0).astype(np.uint8)*255, mode='P')
-            im_tmp = im.reshape([10,10], Image.NEAREST)
-            print np.array(im_tmp, np.unit8)
-            exit(0)
+            im = Image.fromarray(net.blobs[layer].data[0].argmax(0).astype(np.uint8), mode='1')
+            # im_tmp = im.reshape([10,10], Image.NEAREST)
+            # print np.array(im_tmp, np.unit8)
+            # exit(0)
             im.save(os.path.join(save_dir, idx + '.png'))
         # compute the loss as well
         loss += net.blobs['loss'].data.flat[0]
