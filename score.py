@@ -13,7 +13,7 @@ def fast_hist(a, b, n):
 
 def compute_hist(net, save_dir, dataset, layer='score', gt='label'):
     n_cl = net.blobs[layer].channels
-    if save_dir:
+    if save_dir and not os.path.exists(save_dir):
         os.mkdir(save_dir)
     hist = np.zeros((n_cl, n_cl))
     loss = 0

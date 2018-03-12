@@ -36,4 +36,4 @@ for ind in range(50):
     solver.step(500)
     # N.B. metrics on the semantic labels are off b.c. of missing classes;
     # score manually from the histogram instead for proper evaluation
-    score.seg_tests(solver, './test_img/test_%i.png' % ind , test, layer='output/relu/sep', gt='sem')
+    score.seg_tests(solver, './test_img' , test, layer='output_sep', gt='label')

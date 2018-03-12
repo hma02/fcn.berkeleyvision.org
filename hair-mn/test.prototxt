@@ -2,7 +2,7 @@ layer {
   name: "data"
   type: "Python"
   top: "data"
-  top: "sem"
+  top: "label"
   python_param {
     module: "hair_layers"
     layer: "SIFTFlowSegDataLayer"
@@ -1195,7 +1195,7 @@ layer {
   name: "loss"
   type: "SoftmaxWithLoss"
   bottom: "output_sep"
-  bottom: "sem"
+  bottom: "label"
   top: "loss"
   loss_param {
     normalize: false

@@ -89,7 +89,7 @@ class MobileNetHair():
         
         n = caffe.NetSpec()
         
-        n.data, n.sem = L.Python(module='hair_layers',
+        n.data, n.label = L.Python(module='hair_layers',
                 layer='SIFTFlowSegDataLayer', ntop=2,
                 param_str=str(dict(siftflow_dir='../data/hair/realdata/'+self.split,
                     split=self.split, seed=1337, batch_size=4)))
@@ -136,7 +136,7 @@ class MobileNetHair():
         
         n.output_dw, n.output_sep, n.output = conv_dw(n.filt5, 16, 2, 1)
         
-        n.loss = L.SoftmaxWithLoss(n.output, n.sem,
+        n.loss = L.SoftmaxWithLoss(n.output, n.label,
                 loss_param=dict(normalize=False))
         
         return n.to_proto()
@@ -147,6 +147,10 @@ def make_net():
 
     with open('test.prototxt', 'w') as f:
         f.write(str(MobileNetHair('test').forward()))
+        
+    # from train2deploy import train2deploy
+    # deploy_prototxt_path = 'deploy.prototxt'
+    # train2deploy('trainval.prototxt', (1, 3, 128, 128), deploy_prototxt_path)
 
 if __name__ == '__main__':
     make_net()
