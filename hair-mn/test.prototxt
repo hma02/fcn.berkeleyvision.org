@@ -2,6 +2,9 @@ layer {
   name: "data"
   type: "Data"
   top: "data"
+  transform_param {
+    scale: 0.00390625
+  }
   data_param {
     source: "/home/allanma/data/hairlmdb/realdata/test_data"
     batch_size: 1

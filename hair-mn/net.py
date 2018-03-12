@@ -186,9 +186,11 @@ class MobileNetHair():
 def make_net():
     with open('trainval.prototxt', 'w') as f:
         f.write(str(MobileNetHair('trainval').forward()))
+        print 'trainval.prottxt updated'
 
     with open('test.prototxt', 'w') as f:
         f.write(str(MobileNetHair('test').forward()))
+        print 'text.prottxt updated'
         
     # from train2deploy import train2deploy
     # deploy_prototxt_path = 'deploy.prototxt'

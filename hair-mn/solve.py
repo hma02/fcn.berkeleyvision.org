@@ -11,6 +11,8 @@ import sys
 # except:
 #     pass
 
+from net import make_net
+make_net()
 
 
 # init
