@@ -1,12 +1,14 @@
 layer {
   name: "data"
-  type: "Python"
+  type: "Input"
   top: "data"
-  top: "sem"
-  python_param {
-    module: "hair_layers"
-    layer: "SIFTFlowSegDataLayer"
-    param_str: "{\'siftflow_dir\': \'../data/hair/realdata/train\', \'seed\': 1337, \'split\': \'train\', \'batch_size\': 4}"
+  input_param {
+    shape {
+      dim: 1
+      dim: 3
+      dim: 128
+      dim: 128
+    }
   }
 }
 layer {
@@ -1190,14 +1192,4 @@ layer {
   type: "ReLU"
   bottom: "output_sep"
   top: "output_sep"
-}
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "output_sep"
-  bottom: "sem"
-  top: "loss"
-  loss_param {
-    normalize: false
-  }
 }
