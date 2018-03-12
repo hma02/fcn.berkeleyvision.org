@@ -10,15 +10,16 @@ layer {
   }
 }
 layer {
-  name: "initial_conv"
+  name: "conv1"
   type: "Convolution"
   bottom: "data"
-  top: "initial_conv"
+  top: "conv1"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 1
@@ -27,47 +28,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "initial_relu"
+  name: "relu1"
   type: "ReLU"
-  bottom: "initial_conv"
-  top: "initial_conv"
+  bottom: "conv1"
+  top: "conv1"
 }
 layer {
-  name: "conv_dw_1"
+  name: "conv2/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_1"
+  bottom: "conv1"
+  top: "conv2/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 16
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_1"
+  name: "conv2/sep"
   type: "Convolution"
-  bottom: "conv_dw_1"
-  top: "conv_sep_1"
+  bottom: "conv2/dw"
+  top: "conv2/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 32
     bias_term: false
     pad: 0
@@ -76,47 +77,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_1"
+  name: "relu2/sep"
   type: "ReLU"
-  bottom: "conv_sep_1"
-  top: "conv_sep_1"
+  bottom: "conv2/sep"
+  top: "conv2/sep"
 }
 layer {
-  name: "conv_dw_2"
+  name: "conv3/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_2"
+  bottom: "conv2/sep"
+  top: "conv3/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 32
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 32
-    stride: 2
+        stride: 2
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_2"
+  name: "conv3/sep"
   type: "Convolution"
-  bottom: "conv_dw_2"
-  top: "conv_sep_2"
+  bottom: "conv3/dw"
+  top: "conv3/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 64
     bias_term: false
     pad: 0
@@ -125,96 +126,96 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_2"
+  name: "relu3/sep"
   type: "ReLU"
-  bottom: "conv_sep_2"
-  top: "conv_sep_2"
+  bottom: "conv3/sep"
+  top: "conv3/sep"
 }
 layer {
-  name: "conv_dw_3"
+  name: "conv4/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_3"
+  bottom: "conv3/sep"
+  top: "conv4/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
-    num_output: 64
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    group: 64
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
     engine: CAFFE
-  }
-}
-layer {
-  name: "conv_sep_3"
-  type: "Convolution"
-  bottom: "conv_dw_3"
-  top: "conv_sep_3"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 64
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-  }
-}
-layer {
-  name: "relu_3"
-  type: "ReLU"
-  bottom: "conv_sep_3"
-  top: "conv_sep_3"
-}
-layer {
-  name: "conv_dw_4"
-  type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_4"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
     num_output: 64
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 64
-    stride: 2
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_4"
+  name: "conv4/sep"
   type: "Convolution"
-  bottom: "conv_dw_4"
-  top: "conv_sep_4"
+  bottom: "conv4/dw"
+  top: "conv4/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
+    num_output: 64
+    bias_term: false
+    pad: 0
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "relu4/sep"
+  type: "ReLU"
+  bottom: "conv4/sep"
+  top: "conv4/sep"
+}
+layer {
+  name: "conv5/dw"
+  type: "Convolution"
+  bottom: "conv4/sep"
+  top: "conv5/dw"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    engine: CAFFE
+    num_output: 64
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 64
+        stride: 2
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "conv5/sep"
+  type: "Convolution"
+  bottom: "conv5/dw"
+  top: "conv5/sep"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    engine: CAFFE
     num_output: 128
     bias_term: false
     pad: 0
@@ -223,47 +224,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_4"
+  name: "relu5/sep"
   type: "ReLU"
-  bottom: "conv_sep_4"
-  top: "conv_sep_4"
+  bottom: "conv5/sep"
+  top: "conv5/sep"
 }
 layer {
-  name: "conv_dw_5"
+  name: "conv6/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_5"
+  bottom: "conv5/sep"
+  top: "conv6/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 128
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 128
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_5"
+  name: "conv6/sep"
   type: "Convolution"
-  bottom: "conv_dw_5"
-  top: "conv_sep_5"
+  bottom: "conv6/dw"
+  top: "conv6/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 128
     bias_term: false
     pad: 0
@@ -272,47 +273,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_5"
+  name: "relu6/sep"
   type: "ReLU"
-  bottom: "conv_sep_5"
-  top: "conv_sep_5"
+  bottom: "conv6/sep"
+  top: "conv6/sep"
 }
 layer {
-  name: "conv_dw_6"
+  name: "conv7/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_6"
+  bottom: "conv6/sep"
+  top: "conv7/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 128
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 128
-    stride: 2
+        stride: 2
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_6"
+  name: "conv7/sep"
   type: "Convolution"
-  bottom: "conv_dw_6"
-  top: "conv_sep_6"
+  bottom: "conv7/dw"
+  top: "conv7/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 0
@@ -321,47 +322,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_6"
+  name: "relu7/sep"
   type: "ReLU"
-  bottom: "conv_sep_6"
-  top: "conv_sep_6"
+  bottom: "conv7/sep"
+  top: "conv7/sep"
 }
 layer {
-  name: "conv_dw_7"
+  name: "conv8/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_7"
+  bottom: "conv7/sep"
+  top: "conv8/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 256
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_7"
+  name: "conv8/sep"
   type: "Convolution"
-  bottom: "conv_dw_7"
-  top: "conv_sep_7"
+  bottom: "conv8/dw"
+  top: "conv8/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 0
@@ -370,47 +371,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_7"
+  name: "relu8/sep"
   type: "ReLU"
-  bottom: "conv_sep_7"
-  top: "conv_sep_7"
+  bottom: "conv8/sep"
+  top: "conv8/sep"
 }
 layer {
-  name: "conv_dw_8"
+  name: "conv9/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_8"
+  bottom: "conv8/sep"
+  top: "conv9/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 256
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_8"
+  name: "conv9/sep"
   type: "Convolution"
-  bottom: "conv_dw_8"
-  top: "conv_sep_8"
+  bottom: "conv9/dw"
+  top: "conv9/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 0
@@ -419,47 +420,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_8"
+  name: "relu9/sep"
   type: "ReLU"
-  bottom: "conv_sep_8"
-  top: "conv_sep_8"
+  bottom: "conv9/sep"
+  top: "conv9/sep"
 }
 layer {
-  name: "conv_dw_9"
+  name: "conv10/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_9"
+  bottom: "conv9/sep"
+  top: "conv10/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 256
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_9"
+  name: "conv10/sep"
   type: "Convolution"
-  bottom: "conv_dw_9"
-  top: "conv_sep_9"
+  bottom: "conv10/dw"
+  top: "conv10/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 0
@@ -468,47 +469,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_9"
+  name: "relu10/sep"
   type: "ReLU"
-  bottom: "conv_sep_9"
-  top: "conv_sep_9"
+  bottom: "conv10/sep"
+  top: "conv10/sep"
 }
 layer {
-  name: "conv_dw_10"
+  name: "conv11/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_10"
+  bottom: "conv10/sep"
+  top: "conv11/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 256
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_10"
+  name: "conv11/sep"
   type: "Convolution"
-  bottom: "conv_dw_10"
-  top: "conv_sep_10"
+  bottom: "conv11/dw"
+  top: "conv11/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 0
@@ -517,47 +518,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_10"
+  name: "relu11/sep"
   type: "ReLU"
-  bottom: "conv_sep_10"
-  top: "conv_sep_10"
+  bottom: "conv11/sep"
+  top: "conv11/sep"
 }
 layer {
-  name: "conv_dw_11"
+  name: "conv12/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_11"
+  bottom: "conv11/sep"
+  top: "conv12/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 256
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_11"
+  name: "conv12/sep"
   type: "Convolution"
-  bottom: "conv_dw_11"
-  top: "conv_sep_11"
+  bottom: "conv12/dw"
+  top: "conv12/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 0
@@ -566,47 +567,47 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_11"
+  name: "relu12/sep"
   type: "ReLU"
-  bottom: "conv_sep_11"
-  top: "conv_sep_11"
+  bottom: "conv12/sep"
+  top: "conv12/sep"
 }
 layer {
-  name: "conv_dw_12"
+  name: "conv13/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_12"
+  bottom: "conv12/sep"
+  top: "conv13/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 256
-    stride: 2
+        stride: 2
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "conv_sep_12"
+  name: "conv13/sep"
   type: "Convolution"
-  bottom: "conv_dw_12"
-  top: "conv_sep_12"
+  bottom: "conv13/dw"
+  top: "conv13/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     bias_term: false
     pad: 0
@@ -615,117 +616,48 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "relu_12"
+  name: "relu13/sep"
   type: "ReLU"
-  bottom: "conv_sep_12"
-  top: "conv_sep_12"
+  bottom: "conv13/sep"
+  top: "conv13/sep"
 }
 layer {
-  name: "conv_dw_13"
+  name: "conv14/dw"
   type: "Convolution"
-  bottom: "initial_conv"
-  top: "conv_dw_13"
+  bottom: "conv13/sep"
+  top: "conv14/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
-    num_output: 512
-    bias_term: false
-    pad: 1
-    kernel_size: 3
-    group: 512
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
     engine: CAFFE
-  }
-}
-layer {
-  name: "conv_sep_13"
-  type: "Convolution"
-  bottom: "conv_dw_13"
-  top: "conv_sep_13"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
-    num_output: 512
-    bias_term: false
-    pad: 0
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "msra"
-    }
-    engine: CAFFE
-  }
-}
-layer {
-  name: "relu_13"
-  type: "ReLU"
-  bottom: "conv_sep_13"
-  top: "conv_sep_13"
-}
-layer {
-  name: "up1"
-  type: "Deconvolution"
-  bottom: "conv_sep_13"
-  top: "up1"
-  param {
-    lr_mult: 0.0
-    decay_mult: 0.0
-  }
-  convolution_param {
-    num_output: 512
-    bias_term: false
-    kernel_size: 2
-    stride: 2
-    weight_filler {
-      type: "bilinear"
-    }
-    engine: CAFFE
-  }
-}
-layer {
-  name: "filt1_dw"
-  type: "Convolution"
-  bottom: "up1"
-  top: "filt1_dw"
-  param {
-    lr_mult: 1.0
-    decay_mult: 1.0
-  }
-  convolution_param {
     num_output: 512
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 512
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt1_sep"
+  name: "conv14/sep"
   type: "Convolution"
-  bottom: "filt1_dw"
-  top: "filt1_sep"
+  bottom: "conv14/dw"
+  top: "conv14/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
-    num_output: 16
+    engine: CAFFE
+    num_output: 512
     bias_term: false
     pad: 0
     kernel_size: 1
@@ -733,67 +665,65 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt1"
+  name: "relu14/sep"
   type: "ReLU"
-  bottom: "filt1_sep"
-  top: "filt1_sep"
+  bottom: "conv14/sep"
+  top: "conv14/sep"
 }
 layer {
-  name: "up2"
+  name: "upsample1"
   type: "Deconvolution"
-  bottom: "filt1_sep"
-  top: "up2"
+  bottom: "conv14/sep"
+  top: "upsample1"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
   }
   convolution_param {
-    num_output: 16
+    engine: CAFFE
+    num_output: 512
+    # group: 2
     bias_term: false
     kernel_size: 2
     stride: 2
-    weight_filler {
-      type: "bilinear"
-    }
-    engine: CAFFE
+    weight_filler: { type: "bilinear" }
   }
 }
 layer {
-  name: "filt2_dw"
+  name: "up1/conv/dw"
   type: "Convolution"
-  bottom: "up2"
-  top: "filt2_dw"
+  bottom: "upsample1"
+  top: "up1/conv/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
-    num_output: 16
+    engine: CAFFE
+    num_output: 512
     bias_term: false
     pad: 1
     kernel_size: 3
-    group: 16
-    stride: 1
+    group: 512
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt2_sep"
+  name: "up1/conv/sep"
   type: "Convolution"
-  bottom: "filt2_dw"
-  top: "filt2_sep"
+  bottom: "up1/conv/dw"
+  top: "up1/conv/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 0
@@ -802,67 +732,65 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt2"
+  name: "up1/relu/sep"
   type: "ReLU"
-  bottom: "filt2_sep"
-  top: "filt2_sep"
+  bottom: "up1/conv/sep"
+  top: "up1/conv/sep"
 }
 layer {
-  name: "up3"
+  name: "upsample2"
   type: "Deconvolution"
-  bottom: "filt2_sep"
-  top: "up3"
+  bottom: "up1/conv/sep"
+  top: "upsample2"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
+    # group: 2
     bias_term: false
     kernel_size: 2
     stride: 2
-    weight_filler {
-      type: "bilinear"
-    }
-    engine: CAFFE
+    weight_filler: { type: "bilinear" }
   }
 }
 layer {
-  name: "filt3_dw"
+  name: "up2/conv/dw"
   type: "Convolution"
-  bottom: "up3"
-  top: "filt3_dw"
+  bottom: "upsample2"
+  top: "up2/conv/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 16
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt3_sep"
+  name: "up2/conv/sep"
   type: "Convolution"
-  bottom: "filt3_dw"
-  top: "filt3_sep"
+  bottom: "up2/conv/dw"
+  top: "up2/conv/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 0
@@ -871,67 +799,65 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt3"
+  name: "up2/relu/sep"
   type: "ReLU"
-  bottom: "filt3_sep"
-  top: "filt3_sep"
+  bottom: "up2/conv/sep"
+  top: "up2/conv/sep"
 }
 layer {
-  name: "up4"
+  name: "upsample3"
   type: "Deconvolution"
-  bottom: "filt3_sep"
-  top: "up4"
+  bottom: "up2/conv/sep"
+  top: "upsample3"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
+    # group: 2
     bias_term: false
     kernel_size: 2
     stride: 2
-    weight_filler {
-      type: "bilinear"
-    }
-    engine: CAFFE
+    weight_filler: { type: "bilinear" }
   }
 }
 layer {
-  name: "filt4_dw"
+  name: "up3/conv/dw"
   type: "Convolution"
-  bottom: "up4"
-  top: "filt4_dw"
+  bottom: "upsample3"
+  top: "up3/conv/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 16
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt4_sep"
+  name: "up3/conv/sep"
   type: "Convolution"
-  bottom: "filt4_dw"
-  top: "filt4_sep"
+  bottom: "up3/conv/dw"
+  top: "up3/conv/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 0
@@ -940,67 +866,65 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt4"
+  name: "up3/relu/sep"
   type: "ReLU"
-  bottom: "filt4_sep"
-  top: "filt4_sep"
+  bottom: "up3/conv/sep"
+  top: "up3/conv/sep"
 }
 layer {
-  name: "up5"
+  name: "upsample4"
   type: "Deconvolution"
-  bottom: "filt4_sep"
-  top: "up5"
+  bottom: "up3/conv/sep"
+  top: "upsample4"
   param {
-    lr_mult: 0.0
-    decay_mult: 0.0
+    lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
+    # group: 2
     bias_term: false
     kernel_size: 2
     stride: 2
-    weight_filler {
-      type: "bilinear"
-    }
-    engine: CAFFE
+    weight_filler: { type: "bilinear" }
   }
 }
 layer {
-  name: "filt5_dw"
+  name: "up4/conv/dw"
   type: "Convolution"
-  bottom: "up5"
-  top: "filt5_dw"
+  bottom: "upsample4"
+  top: "up4/conv/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 16
-    stride: 1
+        stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt5_sep"
+  name: "up4/conv/sep"
   type: "Convolution"
-  bottom: "filt5_dw"
-  top: "filt5_sep"
+  bottom: "up4/conv/dw"
+  top: "up4/conv/sep"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 0
@@ -1009,47 +933,114 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "filt5"
+  name: "up4/relu/sep"
   type: "ReLU"
-  bottom: "filt5_sep"
-  top: "filt5_sep"
+  bottom: "up4/conv/sep"
+  top: "up4/conv/sep"
 }
 layer {
-  name: "output_dw"
-  type: "Convolution"
-  bottom: "filt5_sep"
-  top: "output_dw"
+  name: "upsample5"
+  type: "Deconvolution"
+  bottom: "up4/conv/sep"
+  top: "upsample5"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
+    num_output: 16
+    # group: 2
+    bias_term: false
+    kernel_size: 2
+    stride: 2
+    weight_filler: { type: "bilinear" }
+  }
+}
+layer {
+  name: "up5/conv/dw"
+  type: "Convolution"
+  bottom: "upsample5"
+  top: "up5/conv/dw"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    engine: CAFFE
     num_output: 16
     bias_term: false
     pad: 1
     kernel_size: 3
     group: 16
+        stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "up5/conv/sep"
+  type: "Convolution"
+  bottom: "up5/conv/dw"
+  top: "up5/conv/sep"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    engine: CAFFE
+    num_output: 16
+    bias_term: false
+    pad: 0
+    kernel_size: 1
     stride: 1
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "output_sep"
+  name: "up5/relu/sep"
+  type: "ReLU"
+  bottom: "up5/conv/sep"
+  top: "up5/conv/sep"
+}
+layer {
+  name: "output/conv/dw"
   type: "Convolution"
-  bottom: "output_dw"
-  top: "output_sep"
+  bottom: "up5/conv/sep"
+  top: "output/conv/dw"
   param {
-    lr_mult: 1.0
-    decay_mult: 1.0
+    lr_mult: 1
+    decay_mult: 1
   }
   convolution_param {
+    engine: CAFFE
+    num_output: 16
+    bias_term: false
+    pad: 1
+    kernel_size: 3
+    group: 16
+        stride: 1
+    weight_filler {
+      type: "msra"
+    }
+  }
+}
+layer {
+  name: "output/conv/sep"
+  type: "Convolution"
+  bottom: "output/conv/dw"
+  top: "output/conv/sep"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  convolution_param {
+    engine: CAFFE
     num_output: 2
     bias_term: false
     pad: 0
@@ -1058,22 +1049,21 @@ layer {
     weight_filler {
       type: "msra"
     }
-    engine: CAFFE
   }
 }
 layer {
-  name: "output"
+  name: "output/relu/sep"
   type: "ReLU"
-  bottom: "output_sep"
-  top: "output_sep"
+  bottom: "output/conv/sep"
+  top: "output/relu/sep"
 }
 layer {
   name: "loss"
   type: "SoftmaxWithLoss"
-  bottom: "output_sep"
+  bottom: "output/relu/sep"
   bottom: "sem"
   top: "loss"
   loss_param {
-    normalize: false
+    normalize: true
   }
 }

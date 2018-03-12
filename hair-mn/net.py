@@ -112,23 +112,23 @@ class MobileNetHair():
         
         
         n.up1 = upsample(n.relu_13, 512)
-        # n.skip1 = skip(n.relu_11, 256, 512, 1)
-        # n.up1 = eltsum(n.up1,n.skip1)
+        n.skip1 = skip(n.relu_11, 256, 512, 1)
+        n.up1 = eltsum(n.up1,n.skip1)
         n.filt1_dw, n.filt1_sep, n.filt1 = conv_dw(n.up1, 512, 16, 1)
         
         n.up2 = upsample(n.filt1, 16)
-        # n.skip2 = skip(n.relu_5, 128, 16, 1)
-        # n.up2 = eltsum(n.up2,n.skip2)
+        n.skip2 = skip(n.relu_5, 128, 16, 1)
+        n.up2 = eltsum(n.up2,n.skip2)
         n.filt2_dw, n.filt2_sep, n.filt2 = conv_dw(n.up2, 16, 16, 1)
         
         n.up3 = upsample(n.filt2, 16)
-        # n.skip3 = skip(n.relu_3, 64, 16, 1)
-        # n.up3 = eltsum(n.up3,n.skip3)
+        n.skip3 = skip(n.relu_3, 64, 16, 1)
+        n.up3 = eltsum(n.up3,n.skip3)
         n.filt3_dw, n.filt3_sep, n.filt3 = conv_dw(n.up3, 16, 16, 1)
         
         n.up4 = upsample(n.filt3, 16)
-        # n.skip4 = skip(n.relu_1, 32, 16, 1)
-        # n.up4 = eltsum(n.up4,n.skip4)
+        n.skip4 = skip(n.relu_1, 32, 16, 1)
+        n.up4 = eltsum(n.up4,n.skip4)
         n.filt4_dw, n.filt4_sep, n.filt4 = conv_dw(n.up4, 16, 16, 1)
         
         n.up5 = upsample(n.filt4, 16)
