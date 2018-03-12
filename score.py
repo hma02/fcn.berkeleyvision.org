@@ -5,6 +5,7 @@ import os
 import sys
 from datetime import datetime
 from PIL import Image
+from tqdm import tqdm
 
 def fast_hist(a, b, n):
     k = (a >= 0) & (a < n)
@@ -16,7 +17,7 @@ def compute_hist(net, save_dir, dataset, layer='score', gt='label'):
         os.mkdir(save_dir)
     hist = np.zeros((n_cl, n_cl))
     loss = 0
-    for idx in dataset:
+    for idx in tqdm(dataset):
         net.forward()
         hist += fast_hist(net.blobs[gt].data[0, 0].flatten(),
                                 net.blobs[layer].data[0].argmax(0).flatten(),

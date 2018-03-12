@@ -1,17 +1,25 @@
 train_net: "trainval.prototxt"
 test_net: "test.prototxt"
-test_iter: 200
-# make test net, but don't invoke it from the solver itself
-test_interval: 999999999
-display: 20
-average_loss: 20
-lr_policy: "fixed"
-# lr for unnormalized softmax
-base_lr: 1e-12
-# high momentum
-momentum: 0.99
-# no gradient accumulation
-iter_size: 1
-max_iter: 300000
-weight_decay: 0.0005
 test_initialization: false
+test_iter: 200
+test_interval: 999999999
+
+display: 20
+# average_loss: 20
+base_lr: 0.0001
+lr_policy: "poly"
+power: 0.98
+max_iter: 500000
+# momentum: 0.9
+weight_decay: 0.00002
+snapshot: 1000
+snapshot_prefix: "mobilenet"
+solver_mode: GPU
+type: "Adam"
+random_seed: 123 #or your favorite seed value
+
+
+# type: "AdaDelta"
+# delta: 1e-6
+# base_lr: 1.0
+# momentum: 0.95

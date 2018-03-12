@@ -5,123 +5,132 @@ from caffe.coord_map import crop
 def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
         num_output=nout, pad=pad,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
+        param=[dict(lr_mult=1, decay_mult=1)],
+        bias_term=False,
+        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+        ) 
     return conv, L.ReLU(conv, in_place=True)
 
-def max_pool(bottom, ks=2, stride=2):
-    return L.Pooling(bottom, pool=P.Pooling.MAX, kernel_size=ks, stride=stride)
+# def max_pool(bottom, ks=2, stride=2):
+#     return L.Pooling(bottom, pool=P.Pooling.MAX, kernel_size=ks, stride=stride)
 
-def fcn(split):
-    n = caffe.NetSpec()
-    n.data, n.sem, n.geo = L.Python(module='siftflow_layers',
-            layer='SIFTFlowSegDataLayer', ntop=3,
-            param_str=str(dict(siftflow_dir='../data/sift-flow/data/',
-                split=split, seed=1337)))
 
-    # the base net
-    n.conv1_1, n.relu1_1 = conv_relu(n.data, 64, pad=100)
-    n.conv1_2, n.relu1_2 = conv_relu(n.relu1_1, 64)
-    n.pool1 = max_pool(n.relu1_2)
+def upsample(bottom):
+    
+    return L.Deconvolution(bottom, 
+        param=[dict(lr_mult=0, decay_mult=0)],
+        convolution_param=dict(
+                                kernel_size=2, 
+                                stride=2,
+                                num_output=16,
+                                bias_term=False,
+                                weight_filler=dict(type="bilinear"),
+                                engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+                                )
+        )
+            
+        
+def skip(bottom, nin, nout, ks):
+    
+    conv = L.Convolution(bottom, kernel_size=ks, stride=1,
+        num_output=nout, pad=0,
+        param=[dict(lr_mult=1, decay_mult=1)],
+        bias_term=False,
+        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+        )
+        
+    return conv
 
-    n.conv2_1, n.relu2_1 = conv_relu(n.pool1, 128)
-    n.conv2_2, n.relu2_2 = conv_relu(n.relu2_1, 128)
-    n.pool2 = max_pool(n.relu2_2)
+def eltsum(bottom1, bottom2):
+    
+    return L.Eltwise(bottom1, bottom2, operation=P.Eltwise.SUM)
 
-    n.conv3_1, n.relu3_1 = conv_relu(n.pool2, 256)
-    n.conv3_2, n.relu3_2 = conv_relu(n.relu3_1, 256)
-    n.conv3_3, n.relu3_3 = conv_relu(n.relu3_2, 256)
-    n.pool3 = max_pool(n.relu3_3)
+def conv_dw(bottom, nin, nout, stride):
+    
+    conv_dw = L.Convolution(bottom, num_output=nin, kernel_size=3, stride=stride, pad=1, #group=nout,
+        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
+        bias_term=False,
+        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+        )
+        
+    conv_sep = L.Convolution(conv_dw, num_output=nout, kernel_size=1, stride=1, pad=0,
+        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
+        bias_term=False,
+        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+        )
+    
+    return conv_dw, conv_sep, L.ReLU(conv_sep, in_place=True)
 
-    n.conv4_1, n.relu4_1 = conv_relu(n.pool3, 512)
-    n.conv4_2, n.relu4_2 = conv_relu(n.relu4_1, 512)
-    n.conv4_3, n.relu4_3 = conv_relu(n.relu4_2, 512)
-    n.pool4 = max_pool(n.relu4_3)
-
-    n.conv5_1, n.relu5_1 = conv_relu(n.pool4, 512)
-    n.conv5_2, n.relu5_2 = conv_relu(n.relu5_1, 512)
-    n.conv5_3, n.relu5_3 = conv_relu(n.relu5_2, 512)
-    n.pool5 = max_pool(n.relu5_3)
-
-    # fully conv
-    n.fc6, n.relu6 = conv_relu(n.pool5, 4096, ks=7, pad=0)
-    n.drop6 = L.Dropout(n.relu6, dropout_ratio=0.5, in_place=True)
-    n.fc7, n.relu7 = conv_relu(n.drop6, 4096, ks=1, pad=0)
-    n.drop7 = L.Dropout(n.relu7, dropout_ratio=0.5, in_place=True)
-
-    n.score_fr_sem = L.Convolution(n.drop7, num_output=33, kernel_size=1, pad=0,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
-    n.upscore2_sem = L.Deconvolution(n.score_fr_sem,
-        convolution_param=dict(num_output=33, kernel_size=4, stride=2,
-            bias_term=False),
-        param=[dict(lr_mult=0)])
-
-    n.score_pool4_sem = L.Convolution(n.pool4, num_output=33, kernel_size=1, pad=0,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
-    n.score_pool4_semc = crop(n.score_pool4_sem, n.upscore2_sem)
-    n.fuse_pool4_sem = L.Eltwise(n.upscore2_sem, n.score_pool4_semc,
-            operation=P.Eltwise.SUM)
-    n.upscore_pool4_sem  = L.Deconvolution(n.fuse_pool4_sem,
-        convolution_param=dict(num_output=33, kernel_size=4, stride=2,
-            bias_term=False),
-        param=[dict(lr_mult=0)])
-
-    n.score_pool3_sem = L.Convolution(n.pool3, num_output=33, kernel_size=1,
-            pad=0, param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2,
-                decay_mult=0)])
-    n.score_pool3_semc = crop(n.score_pool3_sem, n.upscore_pool4_sem)
-    n.fuse_pool3_sem = L.Eltwise(n.upscore_pool4_sem, n.score_pool3_semc,
-            operation=P.Eltwise.SUM)
-    n.upscore8_sem = L.Deconvolution(n.fuse_pool3_sem,
-        convolution_param=dict(num_output=33, kernel_size=16, stride=8,
-            bias_term=False),
-        param=[dict(lr_mult=0)])
-
-    n.score_sem = crop(n.upscore8_sem, n.data)
-    # loss to make score happy (o.w. loss_sem)
-    n.loss = L.SoftmaxWithLoss(n.score_sem, n.sem,
-            loss_param=dict(normalize=False, ignore_label=255))
-
-    n.score_fr_geo = L.Convolution(n.drop7, num_output=3, kernel_size=1, pad=0,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
-
-    n.upscore2_geo = L.Deconvolution(n.score_fr_geo,
-        convolution_param=dict(num_output=3, kernel_size=4, stride=2,
-            bias_term=False),
-        param=[dict(lr_mult=0)])
-
-    n.score_pool4_geo = L.Convolution(n.pool4, num_output=3, kernel_size=1, pad=0,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
-    n.score_pool4_geoc = crop(n.score_pool4_geo, n.upscore2_geo)
-    n.fuse_pool4_geo = L.Eltwise(n.upscore2_geo, n.score_pool4_geoc,
-            operation=P.Eltwise.SUM)
-    n.upscore_pool4_geo  = L.Deconvolution(n.fuse_pool4_geo,
-        convolution_param=dict(num_output=3, kernel_size=4, stride=2,
-            bias_term=False),
-        param=[dict(lr_mult=0)])
-
-    n.score_pool3_geo = L.Convolution(n.pool3, num_output=3, kernel_size=1,
-            pad=0, param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2,
-                decay_mult=0)])
-    n.score_pool3_geoc = crop(n.score_pool3_geo, n.upscore_pool4_geo)
-    n.fuse_pool3_geo = L.Eltwise(n.upscore_pool4_geo, n.score_pool3_geoc,
-            operation=P.Eltwise.SUM)
-    n.upscore8_geo = L.Deconvolution(n.fuse_pool3_geo,
-        convolution_param=dict(num_output=3, kernel_size=16, stride=8,
-            bias_term=False),
-        param=[dict(lr_mult=0)])
-
-    n.score_geo = crop(n.upscore8_geo, n.data)
-    n.loss_geo = L.SoftmaxWithLoss(n.score_geo, n.geo,
-            loss_param=dict(normalize=False, ignore_label=255))
-
-    return n.to_proto()
+class MobileNetHair():
+    def __init__(self, split):
+        
+        if split!='test':
+            self.split='train'
+        else:
+            self.split='test'
+        
+    def forward(self):
+        
+        n = caffe.NetSpec()
+        
+        n.data, n.sem = L.Python(module='hair_layers',
+                layer='SIFTFlowSegDataLayer', ntop=2,
+                param_str=str(dict(siftflow_dir='../data/hair/realdata/'+self.split,
+                    split=self.split, seed=1337, batch_size=4)))
+        
+        n.initial_conv, n.initial_relu = conv_relu(n.data, nout=16)
+        
+        n.conv_dw_1 , n.conv_sep_1 , n.relu_1  = conv_dw(n.initial_relu, 16, 32, 1)
+        n.conv_dw_2 , n.conv_sep_2 , n.relu_2  = conv_dw(n.initial_relu, 32, 64, 2)
+        n.conv_dw_3 , n.conv_sep_3 , n.relu_3  = conv_dw(n.initial_relu, 64, 64, 1)
+        n.conv_dw_4 , n.conv_sep_4 , n.relu_4  = conv_dw(n.initial_relu, 64, 128, 2)
+        n.conv_dw_5 , n.conv_sep_5 , n.relu_5  = conv_dw(n.initial_relu, 128, 128, 1)
+        n.conv_dw_6 , n.conv_sep_6 , n.relu_6  = conv_dw(n.initial_relu, 128, 256, 2)
+        n.conv_dw_7 , n.conv_sep_7 , n.relu_7  = conv_dw(n.initial_relu, 256, 256, 1)
+        n.conv_dw_8 , n.conv_sep_8 , n.relu_8  = conv_dw(n.initial_relu, 256, 256, 1)
+        n.conv_dw_9 , n.conv_sep_9 , n.relu_9  = conv_dw(n.initial_relu, 256, 256, 1)
+        n.conv_dw_10, n.conv_sep_10, n.relu_10 = conv_dw(n.initial_relu, 256, 256, 1)
+        n.conv_dw_11, n.conv_sep_11, n.relu_11 = conv_dw(n.initial_relu, 256, 256, 1)
+        n.conv_dw_12, n.conv_sep_12, n.relu_12 = conv_dw(n.initial_relu, 256, 512, 2)
+        n.conv_dw_13, n.conv_sep_13, n.relu_13 = conv_dw(n.initial_relu, 512, 512, 1)
+        
+        
+        n.up1 = upsample(n.relu_13)
+        n.skip1 = skip(n.relu_11, 256, 512, 1)
+        n.sum1 = eltsum(n.up1,n.skip1)
+        n.filt1_dw, n.filt1_sep, n.filt1 = conv_dw(n.sum1, 512, 16, 1)
+        
+        n.up2 = upsample(n.filt1)
+        n.skip2 = skip(n.relu_5, 128, 16, 1)
+        n.sum2 = eltsum(n.up2,n.skip2)
+        n.filt2_dw, n.filt2_sep, n.filt2 = conv_dw(n.sum2, 16, 16, 1)
+        
+        n.up3 = upsample(n.filt2)
+        n.skip3 = skip(n.relu_3, 64, 16, 1)
+        n.sum3 = eltsum(n.up3,n.skip3)
+        n.filt3_dw, n.filt3_sep, n.filt3 = conv_dw(n.sum3, 16, 16, 1)
+        
+        n.up4 = upsample(n.filt3)
+        n.skip4 = skip(n.relu_1, 32, 16, 1)
+        n.sum4 = eltsum(n.up4,n.skip4)
+        n.filt4_dw, n.filt4_sep, n.filt4 = conv_dw(n.sum4, 16, 16, 1)
+        
+        n.up5 = upsample(n.filt4)
+        n.filt5_dw, n.filt5_sep, n.filt5 = conv_dw(n.up5, 16, 16, 1)
+        
+        n.output_dw, n.output_sep, n.output = conv_dw(n.filt5, 16, 2, 1)
+        
+        n.loss = L.SoftmaxWithLoss(n.output, n.sem,
+                loss_param=dict(normalize=False))
+        
+        return n.to_proto()
 
 def make_net():
     with open('trainval.prototxt', 'w') as f:
-        f.write(str(fcn('trainval')))
+        f.write(str(MobileNetHair('trainval').forward()))
 
     with open('test.prototxt', 'w') as f:
-        f.write(str(fcn('test')))
+        f.write(str(MobileNetHair('test').forward()))
 
 if __name__ == '__main__':
     make_net()
