@@ -15,7 +15,7 @@ def fcn(split):
     n = caffe.NetSpec()
     n.data, n.sem, n.geo = L.Python(module='siftflow_layers',
             layer='SIFTFlowSegDataLayer', ntop=3,
-            param_str=str(dict(siftflow_dir='../data/sift-flow',
+            param_str=str(dict(siftflow_dir='../data/sift-flow/data/',
                 split=split, seed=1337)))
 
     # the base net

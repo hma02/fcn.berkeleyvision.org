@@ -24,6 +24,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 64
     pad: 100
     kernel_size: 3
@@ -50,6 +51,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 64
     pad: 1
     kernel_size: 3
@@ -87,6 +89,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 128
     pad: 1
     kernel_size: 3
@@ -113,6 +116,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 128
     pad: 1
     kernel_size: 3
@@ -150,6 +154,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     pad: 1
     kernel_size: 3
@@ -176,6 +181,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     pad: 1
     kernel_size: 3
@@ -202,6 +208,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 256
     pad: 1
     kernel_size: 3
@@ -239,6 +246,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     pad: 1
     kernel_size: 3
@@ -265,6 +273,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     pad: 1
     kernel_size: 3
@@ -291,6 +300,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     pad: 1
     kernel_size: 3
@@ -328,6 +338,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     pad: 1
     kernel_size: 3
@@ -354,6 +365,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     pad: 1
     kernel_size: 3
@@ -380,6 +392,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 512
     pad: 1
     kernel_size: 3
@@ -417,6 +430,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 4096
     pad: 0
     kernel_size: 7
@@ -452,6 +466,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 4096
     pad: 0
     kernel_size: 1
@@ -487,6 +502,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 33
     pad: 0
     kernel_size: 1
@@ -501,6 +517,7 @@ layer {
     lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 33
     bias_term: false
     kernel_size: 4
@@ -521,6 +538,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 33
     pad: 0
     kernel_size: 1
@@ -556,6 +574,7 @@ layer {
     lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 33
     bias_term: false
     kernel_size: 4
@@ -576,6 +595,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 33
     pad: 0
     kernel_size: 1
@@ -611,6 +631,7 @@ layer {
     lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 33
     bias_term: false
     kernel_size: 16
@@ -653,6 +674,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 3
     pad: 0
     kernel_size: 1
@@ -667,6 +689,7 @@ layer {
     lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 3
     bias_term: false
     kernel_size: 4
@@ -687,6 +710,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 3
     pad: 0
     kernel_size: 1
@@ -722,6 +746,7 @@ layer {
     lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 3
     bias_term: false
     kernel_size: 4
@@ -742,6 +767,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 3
     pad: 0
     kernel_size: 1
@@ -777,6 +803,7 @@ layer {
     lr_mult: 0
   }
   convolution_param {
+    engine: CAFFE
     num_output: 3
     bias_term: false
     kernel_size: 16
