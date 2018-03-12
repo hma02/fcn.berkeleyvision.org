@@ -179,7 +179,22 @@ class MobileNetHair():
         n.output_dw, n.output_sep, n.output = conv_dw(n.filt5, 16, 2, 1)
         
         n.loss = L.SoftmaxWithLoss(n.output, n.label,
-                loss_param=dict(normalize=False))
+                softmax_param=dict(axis=1, engine=1),
+                loss_param=dict(normalization=1))
+                
+                # enum NormalizationMode {
+                #     // Divide by the number of examples in the batch times spatial dimensions.
+                #     // Outputs that receive the ignore label will NOT be ignored in computing
+                #     // the normalization factor.
+                #     FULL = 0;
+                #     // Divide by the total number of output locations that do not take the
+                #     // ignore_label.  If ignore_label is not set, this behaves like FULL.
+                #     VALID = 1;
+                #     // Divide by the batch size.
+                #     BATCH_SIZE = 2;
+                #     // Do not normalize the loss.
+                #     NONE = 3;
+                #   }
         
         return n.to_proto()
 

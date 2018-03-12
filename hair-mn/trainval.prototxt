@@ -1210,6 +1210,10 @@ layer {
   bottom: "label"
   top: "loss"
   loss_param {
-    normalize: false
+    normalization: VALID
+  }
+  softmax_param {
+    engine: CAFFE
+    axis: 1
   }
 }
