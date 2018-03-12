@@ -2,27 +2,31 @@ import caffe
 from caffe import layers as L, params as P
 from caffe.coord_map import crop
 
-def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
-    conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
-        num_output=nout, pad=pad,
+def conv_relu(bottom, nout, ks=3, stride=2, pad=1):
+    conv = L.Convolution(bottom, 
         param=[dict(lr_mult=1, decay_mult=1)],
-        bias_term=False,
-        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
-        ) 
+        convolution_param=dict(
+                                kernel_size=ks, stride=stride,
+                                num_output=nout, pad=pad,
+                                bias_term=False,
+                                weight_filler=dict(type="msra"),
+                                engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+                                ) 
+        )
     return conv, L.ReLU(conv, in_place=True)
 
 # def max_pool(bottom, ks=2, stride=2):
 #     return L.Pooling(bottom, pool=P.Pooling.MAX, kernel_size=ks, stride=stride)
 
 
-def upsample(bottom):
+def upsample(bottom, nout):
     
     return L.Deconvolution(bottom, 
         param=[dict(lr_mult=0, decay_mult=0)],
         convolution_param=dict(
                                 kernel_size=2, 
                                 stride=2,
-                                num_output=16,
+                                num_output=nout,
                                 bias_term=False,
                                 weight_filler=dict(type="bilinear"),
                                 engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
@@ -32,11 +36,15 @@ def upsample(bottom):
         
 def skip(bottom, nin, nout, ks):
     
-    conv = L.Convolution(bottom, kernel_size=ks, stride=1,
-        num_output=nout, pad=0,
+    conv = L.Convolution(bottom, 
         param=[dict(lr_mult=1, decay_mult=1)],
-        bias_term=False,
-        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+        convolution_param=dict(
+                            kernel_size=ks, stride=1,
+                            num_output=nout, pad=0,
+                            bias_term=False,
+                            weight_filler=dict(type="msra"),
+                            engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+                            )
         )
         
     return conv
@@ -47,16 +55,24 @@ def eltsum(bottom1, bottom2):
 
 def conv_dw(bottom, nin, nout, stride):
     
-    conv_dw = L.Convolution(bottom, num_output=nin, kernel_size=3, stride=stride, pad=1, #group=nout,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
-        bias_term=False,
-        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+    conv_dw = L.Convolution(bottom, 
+        param=[dict(lr_mult=1, decay_mult=1)],
+        convolution_param=dict(
+                                num_output=nin, kernel_size=3, stride=stride, pad=1, group=nin,
+                                bias_term=False,
+                                weight_filler=dict(type="msra"),
+                                engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+                                )
         )
         
-    conv_sep = L.Convolution(conv_dw, num_output=nout, kernel_size=1, stride=1, pad=0,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)],
-        bias_term=False,
-        engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+    conv_sep = L.Convolution(conv_dw, 
+        param=[dict(lr_mult=1, decay_mult=1)],
+        convolution_param=dict(
+                            num_output=nout, kernel_size=1, stride=1, pad=0,
+                            bias_term=False,
+                            weight_filler=dict(type="msra"),
+                            engine= 1 # DEFAULT = 0; CAFFE = 1; CUDNN = 2;
+                            )
         )
     
     return conv_dw, conv_sep, L.ReLU(conv_sep, in_place=True)
@@ -78,7 +94,7 @@ class MobileNetHair():
                 param_str=str(dict(siftflow_dir='../data/hair/realdata/'+self.split,
                     split=self.split, seed=1337, batch_size=4)))
         
-        n.initial_conv, n.initial_relu = conv_relu(n.data, nout=16)
+        n.initial_conv, n.initial_relu = conv_relu(n.data, 16, 3, 2, 1)
         
         n.conv_dw_1 , n.conv_sep_1 , n.relu_1  = conv_dw(n.initial_relu, 16, 32, 1)
         n.conv_dw_2 , n.conv_sep_2 , n.relu_2  = conv_dw(n.initial_relu, 32, 64, 2)
@@ -95,27 +111,27 @@ class MobileNetHair():
         n.conv_dw_13, n.conv_sep_13, n.relu_13 = conv_dw(n.initial_relu, 512, 512, 1)
         
         
-        n.up1 = upsample(n.relu_13)
-        n.skip1 = skip(n.relu_11, 256, 512, 1)
-        n.sum1 = eltsum(n.up1,n.skip1)
-        n.filt1_dw, n.filt1_sep, n.filt1 = conv_dw(n.sum1, 512, 16, 1)
+        n.up1 = upsample(n.relu_13, 512)
+        # n.skip1 = skip(n.relu_11, 256, 512, 1)
+        # n.up1 = eltsum(n.up1,n.skip1)
+        n.filt1_dw, n.filt1_sep, n.filt1 = conv_dw(n.up1, 512, 16, 1)
         
-        n.up2 = upsample(n.filt1)
-        n.skip2 = skip(n.relu_5, 128, 16, 1)
-        n.sum2 = eltsum(n.up2,n.skip2)
-        n.filt2_dw, n.filt2_sep, n.filt2 = conv_dw(n.sum2, 16, 16, 1)
+        n.up2 = upsample(n.filt1, 16)
+        # n.skip2 = skip(n.relu_5, 128, 16, 1)
+        # n.up2 = eltsum(n.up2,n.skip2)
+        n.filt2_dw, n.filt2_sep, n.filt2 = conv_dw(n.up2, 16, 16, 1)
         
-        n.up3 = upsample(n.filt2)
-        n.skip3 = skip(n.relu_3, 64, 16, 1)
-        n.sum3 = eltsum(n.up3,n.skip3)
-        n.filt3_dw, n.filt3_sep, n.filt3 = conv_dw(n.sum3, 16, 16, 1)
+        n.up3 = upsample(n.filt2, 16)
+        # n.skip3 = skip(n.relu_3, 64, 16, 1)
+        # n.up3 = eltsum(n.up3,n.skip3)
+        n.filt3_dw, n.filt3_sep, n.filt3 = conv_dw(n.up3, 16, 16, 1)
         
-        n.up4 = upsample(n.filt3)
-        n.skip4 = skip(n.relu_1, 32, 16, 1)
-        n.sum4 = eltsum(n.up4,n.skip4)
-        n.filt4_dw, n.filt4_sep, n.filt4 = conv_dw(n.sum4, 16, 16, 1)
+        n.up4 = upsample(n.filt3, 16)
+        # n.skip4 = skip(n.relu_1, 32, 16, 1)
+        # n.up4 = eltsum(n.up4,n.skip4)
+        n.filt4_dw, n.filt4_sep, n.filt4 = conv_dw(n.up4, 16, 16, 1)
         
-        n.up5 = upsample(n.filt4)
+        n.up5 = upsample(n.filt4, 16)
         n.filt5_dw, n.filt5_sep, n.filt5 = conv_dw(n.up5, 16, 16, 1)
         
         n.output_dw, n.output_sep, n.output = conv_dw(n.filt5, 16, 2, 1)
